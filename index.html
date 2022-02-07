@@ -11,11 +11,10 @@
     <title>GGEZ</title>
   </head>
   <body>
-    <h1>Hello!</h1>
+    <h1>Hello! Noob</h1>
 
     <div class="container">
         <form id="line-message">
-            <input type="file" name="image">
             <input type="text" name="message" class="form-control">
             <button type="submit">Send</button>
         </form>
@@ -46,17 +45,16 @@
         $('#line-message').on('submit', function(e){
             e.preventDefault()
             let message = $(this).find('input[name=message]').val()
-            let image = $(this).find('input[name=image')[0].files[0]
-
+            
             liff.sendMessages([
                 {
                     type: 'text',
-                    text: message,                    
+                    text: profile.displayName + ' ส่ง ' + message,                   
                 },
                 {
                     type: 'image',
-                    originalContentUrl: URL.createObjectURL(image),
-                    previewImageUrl: URL.createObjectURL(image),                    
+                    originalContentUrl: profile.pictureUrl,
+                    previewImageUrl: profile.pictureUrl,                    
                 }
             ]).then(() => {
                 liff.closeWindow();
