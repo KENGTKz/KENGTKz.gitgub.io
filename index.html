@@ -15,6 +15,7 @@
 
     <div class="container">
         <form id="line-message">
+            <input type="file" name="image">
             <input type="text" name="message" class="form-control">
             <button type="submit">Send</button>
         </form>
@@ -27,7 +28,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-    <script>
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
+        import { getStorage , ref , uploadBytes} from "https://www.gstatic.com/firebasejs/9.6.6/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfaf5gt_QXQWb8DDBZSCMJzsReQXj_iVQ",
+            authDomain: "kengtkz.firebaseapp.com",
+            projectId: "kengtkz",
+            storageBucket: "kengtkz.appspot.com",
+            messagingSenderId: "479854164160",
+            appId: "1:479854164160:web:ff7dbb5a8f88c04f685525",
+            measurementId: "G-PLCKRFEEW4"
+        };
+
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const storage = getStorage(firebaseApp);
+
+        const imageRef = ref(storage , "images");
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
         const liff_id = '1656870855-bEVppkLo'
         var profile = {};
 
@@ -45,6 +69,32 @@
         $('#line-message').on('submit', function(e){
             e.preventDefault()
             let message = $(this).find('input[name=message]').val()
+            let image = $(this).find('input[name=image]')[0].files[0]
+
+            uploadBytes(imageRef, image, {
+                metadata: {
+                    contentType: image.type,
+                    customMetadata: {
+                        name: profile.displayName,
+                        uid: profile.userId
+                    }
+                }
+            }).then(snapshot => {
+
+                let url = snapshot.metadata.downloadURLs[0]
+                liff.sendMessages([{
+                    type: 'text',
+                    text: message
+                }, {
+                    type: 'image',
+                    originalContentUrl: url,
+                    previewImageUrl: url
+                }]).then(() => {
+                    console.log('Message sent')
+                    liff.closeWindow();
+                })
+
+            })
             
             liff.sendMessages([
                 {
