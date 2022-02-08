@@ -31,8 +31,8 @@
     <script type="module">
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
-        import { getStorage , ref , uploadBytes} from "https://www.gstatic.com/firebasejs/9.6.6/firebase-storage.js";
-
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-storage.js";
+    
         const firebaseConfig = {
             apiKey: "AIzaSyAfaf5gt_QXQWb8DDBZSCMJzsReQXj_iVQ",
             authDomain: "kengtkz.firebaseapp.com",
@@ -42,36 +42,36 @@
             appId: "1:479854164160:web:ff7dbb5a8f88c04f685525",
             measurementId: "G-PLCKRFEEW4"
         };
-
+    
         // Initialize Firebase
         const firebaseApp = initializeApp(firebaseConfig);
         const storage = getStorage(firebaseApp);
-
-        const liff_id = "1656870852-kyrqq8vd"
+    
+        const liff_id = "1656870855-bEVppkLo"
         var profile = {};
-
+    
         liff.init({
             liffId: liff_id
         }).then(async () => {
-
+    
             if(liff.isInClient()){
-
+    
                 profile = await liff.getProfile();
-
+    
             }else{
                 alert("กรุณาเปิดใช้งานในแอพ LINE")
             }
-
+    
         })
-
+    
         $('#line-message').on('submit', function(e){
-
+    
             e.preventDefault()
             let message = $(this).find('input[name=message]').val()
             let image = $(this).find('input[name=image]')[0].files[0]
-
+    
             const imageRef = ref(storage, "images/" + image.name);
-
+    
             uploadBytes(imageRef, image, {
                 metadata: {
                     contentType: image.type,
@@ -81,9 +81,9 @@
                     }
                 }
             }).then(snapshot => {
-
-                getDownloadURL(snapshot).then(url => {
-
+    
+                getDownloadURL(imageRef).then(url => {
+    
                     liff.sendMessages([{
                         type: 'text',
                         text: message
@@ -99,12 +99,14 @@
                     }).catch(error => {
                         console.log("Error sending message: " + error);
                     });
-
+    
                 })
-
+    
             })
-
+    
         })
     </script>
   </body>
 </html>
+
+
